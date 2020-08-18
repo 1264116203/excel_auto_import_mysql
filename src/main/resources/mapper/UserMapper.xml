@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.beibei.mapper.UserMapper">
+
+    <!--    将文件的所有字段导入Sheet1表-->
+    <insert id="autoImportField" parameterType="string">
+        LOAD DATA INFILE '/Users/beibei/Documents/upload/${updatedFileAllName}'
+        ignore into table ${newTableName}
+        fields terminated by ','
+        enclosed by '"'
+    </insert>
+
+    <!--    查询Sheet1所有字段-->
+    <select id="queryAllField" resultType="com.beibei.pojo.MetaTable">
+        select * from meta_table limit 1 ;
+    </select>
+
+    <!--    根据从元表查询的首行数据作为字段名创建新的数据库-->
+    <insert id="createNewTable" parameterType="list">
+        create table ${allFields[0]} (
+        ${allFields[1]} varchar (255)  not null
+        <foreach index="i" item="field" collection="allFields">
+            <if test="i>1">
+                <if test="field!=''">
+                    , ${field} VARCHAR(255)
+                </if>
+            </if>
+
+        </foreach>
+        );
+    </insert>
+    <!--删除所有数据-->
+    <delete id="deleteAll" parameterType="string">
+        delete  from ${tableName} ;
+    </delete>
+    <!--删除第一条数据-->
+    <delete id="deleteFirst" parameterType="string">
+        delete  from ${tableName} limit 1;
+    </delete>
+    <!--删除最后一条数据-->
+<!--    <delete id="deleteLast" parameterType="string">-->
+<!--        delete  from ${tableName} where ${}=${};-->
+<!--    </delete>-->
+    <!--查询数据行数-->
+    <delete id="getCount" parameterType="string">
+        select count (*) from ${tableName} ;
+    </delete>
+
+
+</mapper>
